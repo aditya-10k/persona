@@ -13,7 +13,7 @@ import os
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
@@ -85,24 +85,27 @@ class EmbeddingEngine:
 
     def encode(
         self,
-        texts: Sequence[str],
+        texts: Union[str, Sequence[str]],
         batch_size: Optional[int] = None,
         show_progress_bar: bool = False,
         normalize_embeddings: Optional[bool] = None,
     ) -> np.ndarray:
         """
-        Encode a sequence of texts into dense vectors.
-        Returns float32 numpy array of shape [N, dimension].
+        Encode a text or sequence of texts into dense vectors.
+        Returns float32 numpy array: [dimension] for single str, or [N, dimension] for sequence.
         """
-        if not texts:
-            dim = self.dimension
-            return np.empty((0, dim), dtype=np.float32)
+        if isinstance(texts, str):
+            single = True
+            cleaned_texts = [texts]
+        else:
+            single = False
+            if not texts:
+                dim = self.dimension
+                return np.empty((0, dim), dtype=np.float32)
+            cleaned_texts = [str(t) if t is not None else "" for t in texts]
 
         bs = batch_size or self.config.batch_size
         norm = self.config.normalize_embeddings if normalize_embeddings is None else normalize_embeddings
-
-        # Clean / stringify any unexpected input
-        cleaned_texts = [str(t) if t is not None else "" for t in texts]
 
         vectors = self.model.encode(
             cleaned_texts,
@@ -111,7 +114,13 @@ class EmbeddingEngine:
             normalize_embeddings=norm,
             convert_to_numpy=True,
         )
+        if single:
+            return vectors[0].astype(np.float32)
         return vectors.astype(np.float32)
+
+    def embed_batch(self, texts: Sequence[str], **kwargs) -> np.ndarray:
+        """Alias for encode."""
+        return self.encode(texts, **kwargs)
 
     def encode_pairs(
         self,
