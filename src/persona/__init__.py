@@ -10,6 +10,7 @@ from src.persona.inference import (
     StructuredInferenceEngine,
     StructuredInferenceResult,
 )
+from src.persona.package import PersonaPackageCompiler
 from src.persona.retrieval import (
     RetrievalConfig,
     RetrievalItem,
@@ -33,6 +34,7 @@ __all__ = [
     "EvidenceRegistry",
     "GlobalStyleProfile",
     "PersonaInferenceItem",
+    "PersonaPackageCompiler",
     "RetrievalConfig",
     "RetrievalItem",
     "RetrievalResult",
