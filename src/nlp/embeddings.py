@@ -53,11 +53,21 @@ class EmbeddingEngine:
             from sentence_transformers import SentenceTransformer
 
             logger.info("Loading embedding model '%s' on %s...", self.config.model_name, self.config.device)
-            self._model = SentenceTransformer(
-                self.config.model_name,
-                device=self.config.device,
-                cache_folder=self.config.cache_dir,
-            )
+            try:
+                # Fast path: load directly from local cache without network checks
+                self._model = SentenceTransformer(
+                    self.config.model_name,
+                    device=self.config.device,
+                    cache_folder=self.config.cache_dir,
+                    local_files_only=True,
+                )
+            except Exception:
+                # Fallback: fetch from Hugging Face if not yet cached
+                self._model = SentenceTransformer(
+                    self.config.model_name,
+                    device=self.config.device,
+                    cache_folder=self.config.cache_dir,
+                )
             if hasattr(self._model, "max_seq_length"):
                 self._model.max_seq_length = self.config.max_seq_length
             # Cache dimension

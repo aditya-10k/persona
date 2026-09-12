@@ -6,7 +6,7 @@
 **Primary language:** Python  
 **Target hardware:** Consumer laptop with integrated GPU; CPU-first, GPU-optional  
 **Downstream consumer:** AI Spokesperson / Portfolio Agent  
-**Current phase:** T001–T012 implemented and validated; next task is T013 Semantic Similarity
+**Current phase:** T001–T017 implemented and validated; next task is T018 Code-Switching / Language Analysis
 
 ---
 
@@ -1650,6 +1650,73 @@ The Persona Engine must first produce a stable, tested output contract.
 
 ---
 
+## D012 — Conversation Segmentation & Zero-Leakage Stratified Splitting
+
+**Decision:** 4-hour temporal inactivity threshold segments chats into cohesive dialogue sessions; train/dev/test splits strictly partition at the conversation level with length-bin and initiation stratification.
+
+**Reason:** Message-level random splitting causes severe context leakage across splits. Conversation-level isolation ensures holdout testing truly evaluates generalization.
+
+---
+
+## D013 — Sentence-BERT Model Selection for Hinglish Dialogue
+
+**Decision:** Adopt `l3cube-pune/hindi-sentence-bert-nli` (768 dimensions, 12 layers) as the primary embedding model over generic multilingual MiniLM and raw BERT Masked-LMs.
+
+**Reason:** Contrastive benchmarking revealed +57.1% wider semantic gap on conversational Hinglish triplets, isotropic unit-sphere projections ($L_2 = 1.0$), and strong representation of code/debugging vernacular.
+
+---
+
+## D014 — Vectorized Sub-millisecond Semantic Similarity & Diversity Index
+
+**Decision:** Precompute normalized dot products for vector search; compute Response Diversity Index ($1 - \text{mean pairwise similarity}$) and Context-to-Response alignment across all training turns.
+
+**Reason:** Allows sub-millisecond candidate retrieval ($<1$ ms on CPU) and provides an empirical baseline of conversational variety ($0.7330$).
+
+---
+
+## D015 — Spherical K-Means & Unsupervised Archetype Discovery
+
+**Decision:** Perform K-Means on $L_2$-normalized vector space with centroid re-projection onto the unit hypersphere; evaluate $K \in [6, 18]$ via Cosine Silhouette and Calinski-Harabasz metrics; extract true dataset medoids ($m_k = \arg\max v_i \cdot \mu_k$) and compute class-based TF-IDF (c-TF-IDF) profiles.
+
+**Reason:** Euclidean distance on unit vectors monotonically maps to cosine distance ($\|u - v\|^2 = 2 - 2(u \cdot v)$). The unsupervised sweep identified 6 distinct conversational archetypes covering 100% of training data without manual labeling.
+
+---
+
+## D016 — Explicit Separation of Topic from Style & Situational Probability Matrix
+
+**Decision:** Isolate conversational topic discovery ('what is discussed') from communication style ('how it is spoken') by modeling incoming context embeddings ($K=11, \text{Silhouette}=0.2365$), aggressively filtering out conversational slang and chat participant names, and computing the $P(\text{Style} \mid \text{Topic})$ transition matrix.
+
+**Reason:** Preserves the core architectural principle that professional topics (projects, resume, technical skills) do not dictate a single monolithic style, but systematically shift the probability distribution over response archetypes (e.g. Travel/Flight APIs triggers 53.0% Technical Collaboration, while Formal OJT prompts 24.6% Minimalist Confirmations).
+
+---
+
+## D017 — Quantitative Linguistic Constraints from Empirical Ground Truth
+
+**Decision:** Formally measure and enforce low-level surface linguistic distributions (92.5% zero terminal punctuation, 44.4% multi-bubble burstiness, 43.5% all-lowercase text, 6.6% emoji density with 41.4% burst repetition, and 50.6% hapax legomena ratio) as hard constraints on generation.
+
+**Reason:** Language models default to standard formal prose (e.g., ending every message with a period, sending single long paragraphs, capitalization). Hard constraints grounded in empirical statistics are essential to guarantee authentic persona replication.
+
+---
+
+## D018 — Code-Mixed Syntactic Clause Structuring & Speech Act Quantification
+
+**Decision:** Explicitly model Hinglish syntactic structures: 25.4% verbless fragments (reaching 82.2% in confirmations and 54.7% in reactive slang), 57.4% simple independent clauses, only 3.6% complex subordination, 21.6% negation (reaching 91.5% in Denial/Friction), and a 2.66x self-to-other pronoun orientation ratio.
+
+**Reason:** LLMs tend to over-generate complex subordinations ("Because X happened, although Y was true..."). Capturing the exact fragment vs simple clause ratio ensures the AI Spokesperson constructs dialogue with your genuine conversational rhythm.
+
+---
+
+## D019 — Empirical Code-Switching Ratios & Token Language Distributions
+
+**Decision:** Quantify Hindi-English code-switching into 4 operational conversational modes: Pure English (5.3%), Pure Hindi (43.4%), Code-Switched Hinglish (48.2%), and Neutral/Media (3.1%), with an overall token language distribution of 27.2% English vs 72.8% Hindi, and style-dependent switching dynamics (ranging from 0.1 switches/turn in Minimalist Confirmations to 9.6 switches/turn in Technical Collab).
+
+**Reason:** Persona generation cannot treat bilingualism as uniform noise. Technical discussions organically trigger frequent intra-sentential English insertions (38.5% English tokens, 88.4% code-switched turns), while emotional banter and friction lean heavily on Romanized Hindi matrices (80.7%–87.4% Hindi tokens). Imposing style-conditional code-switching guarantees authentic lexical insertion without awkward translation artifacts.
+
+---
+
+
+
+
 # 22. DOWNSTREAM INTEGRATION CONTRACT
 
 The Persona Engine will eventually expose a clean interface to the AI Spokesperson.
@@ -1767,14 +1834,23 @@ Zero leakage verified: True
 
 ### Completed Phase
 - **T012 — Transformer Embedding Layer**: Implemented in `src/nlp/embeddings.py`, verified with 62/62 tests passing. Stored `train_target_vectors.npz` (7.5 MB), `train_context_vectors.npz` (7.3 MB), and metadata in `data/processed/embeddings/` using `l3cube-pune/hindi-sentence-bert-nli` (768 dimensions, L2 normalized, 0 NaNs).
+- **T013 — Semantic Similarity**: Implemented in `src/nlp/similarity.py`, verified with 68/68 tests passing. Analyzed 2,750 training pairs: Response Diversity Index ($0.7330$), Context-Response Alignment breakdown (8.4% mirroring, 75.1% balanced, 16.5% reactive), and vectorized sub-millisecond Top-K retrieval. Stored `data/processed/similarity_report.json`.
+-**T014 — Semantic Clustering**: Implemented in `src/nlp/clustering.py`, verified with 75/75 tests passing. Executed Spherical K-Means evaluation across $K \in [6, 18]$ on 2,750 training turns. Discovered optimal resolution $K = 6$ (Silhouette = 0.0610, CH = 103.16) uncovering 6 clear texting archetypes: Quick Reactive (23.1%), Extended Venting/Banter (22.6%), Technical/Project Collab (19.1%), Denial/Reassurance (14.6%), Minimalist Confirmations (11.0%), and Direct Inquisitive Probing (9.6%). Stored `cluster_assignments.jsonl`, `cluster_profiles.json`, and `clustering_report.json`.
+- **T015 — Topic Discovery & Tagging**: Implemented in `src/nlp/topics.py`, verified with 80/80 tests passing. Modeled context embeddings across $K \in [5, 11]$ ($K=11, \text{Silhouette}=0.2365, \text{CH}=124.17$), discovering 11 domain topics (LaTeX Resume Formatting, Flight/Travel APIs, Hotel APIs, XML Backend Serialization, College Placements & Companies, Exams/Academics, Formal OJT). Discovered the empirical Situational Transition Probability Matrix $P(\text{Style} \mid \text{Topic})$ proving topic-driven style modulation (e.g., Flight APIs triggers 53.0% Technical Collab, while Formal OJT triggers 24.6% Minimalist Confirmations). Stored `topic_assignments.jsonl`, `topic_profiles.json`, `topic_style_matrix.json`, and `topic_report.json`.
+- **T016 — Surface Linguistic Profile**: Implemented in `src/nlp/linguistics.py`, verified with 87/87 tests passing. Measured empirical distributions across 2,750 training turns: 92.5% zero terminal punctuation, 44.4% multi-bubble burstiness (avg 1.86 msgs/turn), 43.5% all-lowercase casing, 6.6% selective emoji usage (41.4% burst repetition, #1 emoji 😭 with 147 occurrences), and 50.6% hapax legomena ratio. Stored `global_linguistic_profile.json`, `style_linguistic_profiles.json`, and `linguistics_report.json`.
+- **T017 — Syntactic Profile**: Implemented in `src/nlp/syntax.py`, verified with 94/94 tests passing. Quantified clause structures and speech acts across code-mixed Hinglish: 25.4% verbless fragments (reaching 82.2% in confirmations and 54.7% in reactive slang), 57.4% simple clauses, only 3.6% complex subordination, 23.2% interrogatives (surging to 93.2% in probing), 21.6% negation (reaching 91.5% in Denial/Friction), and a 2.66x self-to-other pronoun orientation ratio. Stored `global_syntactic_profile.json`, `style_syntactic_profiles.json`, and `syntax_report.json`.
 
 ### Next task
 
 Proceed to:
 
 ```text
-T013 Semantic Similarity
+T018 Code-Switching / Language Analysis
 ```
+
+
+
+
 
 Then continue in dependency order through semantic similarity, clustering, topic discovery, linguistic fingerprinting, behavioral inference, persona packaging, and evaluation.
 
