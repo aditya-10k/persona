@@ -10,6 +10,13 @@ from src.persona.inference import (
     StructuredInferenceEngine,
     StructuredInferenceResult,
 )
+from src.persona.retrieval import (
+    RetrievalConfig,
+    RetrievalItem,
+    RetrievalResult,
+    StyleEmbeddingIndex,
+    StyleRetriever,
+)
 from src.persona.style import GlobalStyleProfile, SituationalStyleProfile, StyleProfileBuilder
 from src.persona.style_examples import (
     StyleExample,
@@ -26,13 +33,18 @@ __all__ = [
     "EvidenceRegistry",
     "GlobalStyleProfile",
     "PersonaInferenceItem",
+    "RetrievalConfig",
+    "RetrievalItem",
+    "RetrievalResult",
     "SituationalStyleProfile",
     "StructuredInferenceEngine",
     "StructuredInferenceResult",
+    "StyleEmbeddingIndex",
     "StyleExample",
     "StyleExampleBuilder",
     "StyleExampleConfig",
     "StyleExampleResult",
     "StyleProfileBuilder",
+    "StyleRetriever",
     "extract_style_tags",
 ]
