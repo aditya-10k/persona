@@ -1748,6 +1748,22 @@ The Persona Engine must first produce a stable, tested output contract.
 
 ---
 
+## D024 — Strict Epistemic Partitioning in Structured Persona Inference
+
+**Decision:** Formulate all higher-level behavioral interpretations with strict tripartite epistemic partitioning: `OBSERVED` (hard empirical facts derived from the corpus), `INFERRED` (conservative, testable generalizations about communicative stance), and `UNKNOWN` (private relationships, personal finances, unverified career plans, and emotional interiors).
+
+**Reason:** Unconstrained LLMs frequently hallucinate biographical gossip or invent personality traits when summarizing chats. Explicitly demanding an `UNKNOWN` category forces the model to quarantine non-communication private domains and preserves privacy under the Core Decoupling Principle.
+
+---
+
+## D025 — Grounded Evidence Registry with Auditable Turn-Level Provenance
+
+**Decision:** Maintain a centralized, queryable `EvidenceRegistry` where every behavioral rule and stylistic constraint in the persona package is bound to an empirical score, statistical confidence interval ($\ge 0.93$), epistemic status, and exact supporting turn counts (e.g. 2,542 turns for zero terminal punctuation, 1,324 turns for code-switching).
+
+**Reason:** Eliminates "black box" persona generation. Every guideline injected into the downstream AI Spokesperson system prompt can be traced directly to an auditable empirical footprint in the sanitized dataset.
+
+---
+
 
 
 
