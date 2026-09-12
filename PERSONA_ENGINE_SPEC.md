@@ -1714,6 +1714,40 @@ The Persona Engine must first produce a stable, tested output contract.
 
 ---
 
+## D020 — Discourse Act Modeling & Empirical Context Transitions
+
+**Decision:** Formally classify conversational turns into 10 pragmatic discourse functions (`AGREE` [9.9%], `DISAGREE` [15.3%], `QUESTION` [19.6%], `EXPLAIN` [1.4%], `CLARIFY` [0.6%], `HEDGE` [1.3%], `ADVICE` [1.7%], `HUMOR` [4.0%], `EMPHASIS` [1.5%], `INFORMATIVE` [44.9%]), and measure empirical context-conditioned transition probabilities $P(\text{Response Act} \mid \text{Context Act})$ (e.g., questions elicit 43.3% informative answers, 20.2% counter-questions, and 16.4% direct disagreement).
+
+**Reason:** High-fidelity persona generation requires modeling interpersonal communicative intent, not just vocabulary or grammar. The empirical discourse profile reveals strong style-dependent pragmatic stances (e.g. 67.0% disagreement in Denial/Friction, 92.1% interrogative probing in Inquisitive Probing, and 38.9% agreement in Minimalist Confirmations) that instruct the downstream spokesperson when to push back, probe, explain, or confirm.
+
+---
+
+## D021 — Multi-Signal Situational Context Classification
+
+**Decision:** Segment conversational environments into 6 core situations: Advice / Probing (39.3%), Casual Banter (19.9%), Career / Academic (18.4%), Technical Collab (12.3%), Conflict / Friction (6.3%), and Acknowledgement (3.7%), combining multi-turn lexical cues, topic clustering, and response brevity.
+
+**Reason:** Communication personas do not exist in a vacuum; human communicators dramatically modulate tone, vocabulary, and syntax based on situational context. Grounding the persona in 6 distinct situational modes enables the spokesperson to switch naturally between terse technical problem solving (27.1% in C04), peer academic discussions, and casual emotional banter.
+
+---
+
+## D022 — Quantified Behavioral Profiling with Empirical Evidence Exemplars
+
+**Decision:** Formulate 10 normalized psychological/behavioral dimensions ($[0.0, 1.0]$): Directness (0.45), Verbosity (0.31), Hedging (0.03), Disagreement Style (0.19), Humor/Playfulness (0.06), Question Initiative (0.23), Confidence/Assertion (0.48), Emotional Expressiveness (0.04), Code-Switching Propensity (0.33), and Technical Depth (0.03), grounded with top mined supporting exemplar pairs from the corpus.
+
+**Reason:** Raw token statistics alone do not give language model system prompts actionable behavioral instructions. Quantifying explicit behavioral dimensions provides unambiguous calibration targets (e.g., extremely low hedging at 0.03 and high confidence at 0.48 prohibit apologetic sycophancy, while 0.80 disagreement in friction situations enforces authentic unvarnished pushback).
+
+---
+
+## D023 — Global & Situational Style Synthesis for Persona Delivery
+
+**Decision:** Synthesize all empirical NLP analyses (linguistics, syntax, code-switching, discourse acts, and behavioral traits) into two complementary tiers:
+1. **Global Style Profile (T022)**: Encapsulating overall core dimensions (Formality: 0.27, Directness: 0.45, Verbosity: 0.31, Confidence: 0.48, Hedging: 0.03), surface constraints (92.5% zero terminal punctuation, 43.5% lowercase, 19.9% multi-bubble bursts), and language mechanics (27.2% English vs 72.8% Hindi tokens, 48.2% code-switched).
+2. **Situational Style Profiles (T023)**: Modulating these parameters dynamically across 6 conversational environments: Technical Collab (41.5% English tokens, 0.20 technical depth), Conflict / Friction (90.0% disagreement, 89.2% Hindi matrix), Acknowledgement (1.00 directness, 0.03 verbosity), Casual Banter, Career / Academic, and Advice / Probing.
+
+**Reason:** A static single prompt cannot capture human conversational dynamics. Providing both a global baseline and situation-conditioned modulations enables the downstream AI Spokesperson to maintain authentic baseline habits while shifting smoothly between terse technical problem solving, peer banter, and direct disagreement.
+
+---
+
 
 
 
