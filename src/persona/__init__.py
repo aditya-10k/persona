@@ -11,6 +11,13 @@ from src.persona.inference import (
     StructuredInferenceResult,
 )
 from src.persona.style import GlobalStyleProfile, SituationalStyleProfile, StyleProfileBuilder
+from src.persona.style_examples import (
+    StyleExample,
+    StyleExampleBuilder,
+    StyleExampleConfig,
+    StyleExampleResult,
+    extract_style_tags,
+)
 
 __all__ = [
     "EpistemicStatus",
@@ -22,5 +29,10 @@ __all__ = [
     "SituationalStyleProfile",
     "StructuredInferenceEngine",
     "StructuredInferenceResult",
+    "StyleExample",
+    "StyleExampleBuilder",
+    "StyleExampleConfig",
+    "StyleExampleResult",
     "StyleProfileBuilder",
+    "extract_style_tags",
 ]
