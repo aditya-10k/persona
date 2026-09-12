@@ -60,12 +60,8 @@ CONTENT_STOPWORDS: Set[str] = {
     "mai", "aur", "mei", "nai", "hee", "vhi", "voh", "achaa", "ohh", "nah",
     "abhi", "wha", "waha", "yha", "yaha", "okk", "ohkk", "yess", "accha",
     "acchaa", "kia", "kiya", "lie", "liye", "joh", "bas", "karra", "karne",
-    "karte", "kal", "dia", "aaya", "usko", "usne", "itna",
-    # Speaker & contact names from WhatsApp export headers (must not be topics)
-    "user_01", "user_03", "user_04", "tag_04", "gays", "tag_fam", "user_06",
-    "user_07", "user_08", "user_05", "user_09", "user_10", "user_11", "user_12", "user_13",
-    "user_14", "project_12", "tag_alpha", "tag_beta", "user_15", "user_02", "you", "friend",
-    "user_16", "user_17", "user_18", "user_19",
+    # Generic conversational roles & meta tokens (must not be topics)
+    "you", "friend", "user", "admin", "system", "group",
 }
 
 

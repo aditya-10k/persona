@@ -78,9 +78,9 @@ def test_credentials_and_passwords(pii_filter):
     assert "credential" in detected2
 
     # Email followed by password on newline (common forwarded credential format)
-    text3 = "[Forwarded] contact.work@example.com\nSecretPasswd987"
+    text3 = "[Forwarded] user.account@example.com\nSecretPasswd987"
     sanitized3, detected3 = pii_filter.mask_pii(text3)
-    assert "contact.work@example.com" not in sanitized3
+    assert "user.account@example.com" not in sanitized3
     assert "SecretPasswd987" not in sanitized3
     assert "[EMAIL]" in sanitized3
     assert "[CREDENTIAL]" in sanitized3

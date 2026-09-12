@@ -85,7 +85,25 @@ def main() -> None:
                 len(pairs), len(context_vectors), len(style_labels))
 
     # 4. Sweep topic candidate counts
-    engine = TopicDiscoveryEngine(TopicConfig(random_seed=42, exemplars_per_topic=4))
+    dynamic_stopwords = set()
+    sender_stats_path = data_dir / "sender_stats.json"
+    if sender_stats_path.exists():
+        try:
+            with open(sender_stats_path, "r", encoding="utf-8") as sf:
+                stats = json.load(sf)
+                for s in stats.keys():
+                    for token in s.lower().replace("(", " ").replace(")", " ").replace("_", " ").split():
+                        if len(token) > 2:
+                            dynamic_stopwords.add(token)
+        except Exception as e:
+            logger.warning("Could not read sender stats for dynamic stopword extraction: %s", e)
+
+    config_kwargs = {"random_seed": 42, "exemplars_per_topic": 4}
+    if dynamic_stopwords:
+        from src.nlp.topics import CONTENT_STOPWORDS
+        config_kwargs["content_stopwords"] = set(CONTENT_STOPWORDS) | dynamic_stopwords
+
+    engine = TopicDiscoveryEngine(TopicConfig(**config_kwargs))
     k_range = list(range(5, 12))
     logger.info("Evaluating topic candidate count K in range %s ...", k_range)
 

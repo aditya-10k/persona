@@ -62,11 +62,11 @@ def test_forwarded_is_not_a_block():
 
 def test_media_types():
     text = (
-        "[6/5/26, 9:53:48 PM] Friend_01: <GIF omitted>\n"
-        "[9/7/26, 6:37:43 PM] Friend_01: <video omitted>\n"
+        "[6/5/26, 9:53:48 PM] Alice: <GIF omitted>\n"
+        "[9/7/26, 6:37:43 PM] Alice: <video omitted>\n"
         "[9/11/26, 11:43:32 AM] You: <document omitted>\n"
         "[9/11/26, 11:21:18 AM] You: <image omitted>\n"
-        "[6/19/26, 7:00:34 PM] Friend_01: <album message>"
+        "[6/19/26, 7:00:34 PM] Alice: <album message>"
     )
     result = WhatsAppParser().parse_text(text)
 
@@ -83,9 +83,9 @@ def test_media_types():
 
 def test_document_and_forwarded_document_are_classified_as_document():
     text = (
-        "[9/11/26, 2:07:48 PM] Friend_01: "
+        "[9/11/26, 2:07:48 PM] Alice: "
         "[Forwarded] <document omitted> SampleDoc.pdf\n"
-        "[9/11/26, 2:07:56 PM] Friend_01: project resume doc"
+        "[9/11/26, 2:07:56 PM] Alice: project resume doc"
     )
     result = WhatsAppParser().parse_text(text)
 
@@ -96,7 +96,7 @@ def test_document_and_forwarded_document_are_classified_as_document():
 
 def test_deleted_and_call():
     text = (
-        "[7/29/26, 5:35:34 AM] Friend_01: This message was deleted\n"
+        "[7/29/26, 5:35:34 AM] Alice: This message was deleted\n"
         "[6/17/26, 9:44:18 PM] - [Call]"
     )
     result = WhatsAppParser().parse_text(text)
@@ -108,10 +108,10 @@ def test_deleted_and_call():
 
 
 def test_colon_inside_message():
-    text = "[9/11/26, 11:48:04 AM] Friend_01: URL: https://example.com?a=1:b"
+    text = "[9/11/26, 11:48:04 AM] Alice: URL: https://example.com?a=1:b"
     result = WhatsAppParser().parse_text(text)
 
-    assert result.messages[0].sender == "Friend_01"
+    assert result.messages[0].sender == "Alice"
     assert result.messages[0].text == "URL: https://example.com?a=1:b"
 
 

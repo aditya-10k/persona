@@ -51,7 +51,7 @@ ENCRYPTION_PREAMBLE = (
 #   - User A left
 #   - User B created the group
 #   - You added User A
-#   - Someone added User D
+#   - Someone added User C
 #   - You changed the group name to '...'
 #
 # These are not conversation messages authored by a sender.
@@ -1311,8 +1311,8 @@ class DatasetValidator:
         #
         # Examples:
         #
-        #   - User B added User C and Friend_01
-        #   - Someone added User D
+        #   - User B added User C and User A
+        #   - Someone added User C
         #   - You added User A
         # ------------------------------------------------------------
 
@@ -1324,8 +1324,8 @@ class DatasetValidator:
         #
         # Examples:
         #
-        #   - User A removed User D
-        #   - User B removed User E GroupBeta(...)
+        #   - User A removed User C
+        #   - User B removed User D(...)
         # ------------------------------------------------------------
 
         if " removed " in event_text:
@@ -1338,7 +1338,7 @@ class DatasetValidator:
         #
         #   - User A left
         #   - User B left
-        #   - User D left
+        #   - User C left
         # ------------------------------------------------------------
 
         if event_text.endswith(" left"):
@@ -1350,7 +1350,7 @@ class DatasetValidator:
         # Examples:
         #
         #   - User B changed the group name to 'Group Alpha'
-        #   - You changed the group name to 'cuckingham palace'
+        #   - You changed the group name to 'Group Beta'
         # ------------------------------------------------------------
 
         if " changed the group name to " in event_text:

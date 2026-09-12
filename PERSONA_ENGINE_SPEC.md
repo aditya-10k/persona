@@ -369,18 +369,18 @@ The parser was also run across the full raw dataset.
 Per-file extracted record counts:
 
 ```text
-chat_01.txt                                  1,676
-chat_02.txt                               1,099
-chat_03.txt                          2,457
-chat_04.txt  2,366
-chat_05.txt                                   719
+chat_01.txt                                    1,676
+chat_02.txt                                    1,099
+chat_03.txt                                    2,457
+chat_04.txt                                    2,366
+chat_05.txt                                      719
 chat_06.txt                                      486
-chat_07.txt                           15,936
-chat_08.txt                        7,390
-chat_09.txt                                264
-chat_10.txt                                   127
-chat_11.txt                       34,133
-chat_12.txt                     2,472
+chat_07.txt                                   15,936
+chat_08.txt                                    7,390
+chat_09.txt                                      264
+chat_10.txt                                      127
+chat_11.txt                                   34,133
+chat_12.txt                                    2,472
 chat_13.txt                                    4,735
 ```
 
