@@ -251,8 +251,8 @@ class PersonaPipeline:
         self.logger.info("Stage 2: Canonicalizing message schema ...")
         transform(
             parsed_path=parsed_path,
-            output_path=messages_path,
-            stats_path=stats_path,
+            output_jsonl=messages_path,
+            sender_stats_path=stats_path,
         )
         self.logger.info("Stage 2 complete: Canonical dataset and sender stats written.")
         return messages_path, stats_path
@@ -288,9 +288,9 @@ class PersonaPipeline:
 
         self.logger.info("Stage 4: Normalizing and cleaning message text ...")
         report = clean_dataset(
-            input_file=str(sanitized_path),
-            output_file=str(cleaned_path),
-            report_file=str(report_path),
+            input_jsonl_path=str(sanitized_path),
+            output_jsonl_path=str(cleaned_path),
+            report_output_path=str(report_path),
         )
         self.logger.info(
             "Stage 4 complete: %d messages cleaned (%d tokens extracted).",
@@ -309,9 +309,9 @@ class PersonaPipeline:
 
         self.logger.info("Stage 5: Segmenting messages into conversational sessions (gap=4.0h) ...")
         report = segment_dataset(
-            input_file=str(cleaned_path),
-            output_file=str(conversations_path),
-            report_file=str(report_path),
+            input_jsonl_path=str(cleaned_path),
+            output_jsonl_path=str(conversations_path),
+            report_output_path=str(report_path),
             gap_hours=4.0,
         )
         self.logger.info(
@@ -331,9 +331,9 @@ class PersonaPipeline:
 
         self.logger.info("Stage 6: Reconstructing context-response pairs for '%s' ...", target_speaker)
         report = reconstruct_context_dataset(
-            input_file=str(conversations_path),
-            output_file=str(pairs_path),
-            report_file=str(report_path),
+            input_conversations_path=str(conversations_path),
+            output_pairs_path=str(pairs_path),
+            report_output_path=str(report_path),
             max_context_turns=3,
             target_speaker=target_speaker,
         )
@@ -355,9 +355,9 @@ class PersonaPipeline:
 
         self.logger.info("Stage 7: Applying quality heuristics and noise filters ...")
         report = filter_context_pairs_dataset(
-            input_file=str(pairs_path),
-            output_file=str(filtered_path),
-            report_file=str(report_path),
+            input_pairs_path=str(pairs_path),
+            output_pairs_path=str(filtered_path),
+            report_output_path=str(report_path),
         )
         self.logger.info(
             "Stage 7 complete: %d pairs passed (%.1f%% pass rate).",
@@ -376,9 +376,9 @@ class PersonaPipeline:
 
         self.logger.info("Stage 8: Running source-balanced stratified sampling ...")
         report = sample_context_pairs_dataset(
-            input_file=str(filtered_path),
-            output_file=str(sampled_path),
-            report_file=str(report_path),
+            input_pairs_path=str(filtered_path),
+            output_pairs_path=str(sampled_path),
+            report_output_path=str(report_path),
             max_per_source=500,
             random_seed=self.config.random_seed,
         )
@@ -402,10 +402,10 @@ class PersonaPipeline:
 
         self.logger.info("Stage 9: Partitioning dataset (70%% Train / 15%% Dev / 15%% Test) ...")
         report = create_dataset_splits(
-            pairs_file=str(sampled_path),
-            conversations_file=str(conversations_path),
+            input_pairs_path=str(sampled_path),
+            conversations_path=str(conversations_path),
             output_dir=str(self.config.work_dir),
-            report_file=str(report_path),
+            report_output_path=str(report_path),
             train_ratio=0.70,
             dev_ratio=0.15,
             test_ratio=0.15,
@@ -550,7 +550,7 @@ class PersonaPipeline:
             return assignments_path, np.array(labels, dtype=int)
 
         self.logger.info("Stage 12: Fitting Spherical K-Means clustering (K=6) ...")
-        engine = ClusteringEngine(ClusterConfig(n_clusters=6, random_seed=self.config.random_seed))
+        engine = ClusteringEngine(ClusterConfig(random_seed=self.config.random_seed))
         result = engine.fit(vectors, k=6)
 
         exemplars = engine.extract_exemplars(
