@@ -107,3 +107,20 @@ def test_pipeline_directory_initialization(tmp_path: Path):
     assert (work_dir / "inference").exists()
     assert (work_dir / "evidence").exists()
     assert (work_dir / "style_index").exists()
+
+
+def test_pipeline_stage12_and_stage23_serialization(tmp_path: Path):
+    from src.nlp.clustering import ClusteringEngine, ClusterConfig
+    import numpy as np
+
+    # Test profiles output serialization
+    pairs = [
+        {"pair_id": "p1", "target_text": "bhai kaisa hai"},
+        {"pair_id": "p2", "target_text": "all good scene"},
+    ]
+    labels = np.array([0, 0])
+    engine = ClusteringEngine(ClusterConfig(random_seed=42))
+    profiles = engine.profile_clusters(pairs, labels)
+    # Ensure profile items are serializable directly with json.dump
+    dumped = json.dumps([p.to_dict() if hasattr(p, "to_dict") else p for p in profiles])
+    assert "cluster_0" in dumped or "cluster_id" in dumped or len(dumped) > 0

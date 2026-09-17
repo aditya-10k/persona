@@ -575,7 +575,7 @@ class PersonaPipeline:
                 }, ensure_ascii=False) + "\n")
 
         with open(profiles_path, "w", encoding="utf-8") as f:
-            json.dump([p.to_dict() for p in profiles], f, indent=2, ensure_ascii=False)
+            json.dump([p.to_dict() if hasattr(p, "to_dict") else p for p in profiles], f, indent=2, ensure_ascii=False)
 
         np.savez_compressed(centroids_path, centroids=result.centroids)
         self.logger.info("Stage 12 complete: Silhouette = %.4f", result.silhouette)
@@ -810,15 +810,15 @@ class PersonaPipeline:
                 min_centroid_similarity=0.15,
                 random_seed=self.config.random_seed,
             ))
-            ex_res = builder.build(
+            ex_res = builder.build_exemplars(
                 pairs=pairs,
-                target_vectors=target_vectors,
+                vectors=target_vectors,
                 cluster_assignments=cluster_map,
-                source_anonymizer=source_map,
+                source_map=source_map,
             )
             with open(examples_path, "w", encoding="utf-8") as f:
-                for ex in ex_res.exemplars:
-                    f.write(json.dumps(ex, ensure_ascii=False) + "\n")
+                for ex in ex_res.examples:
+                    f.write(json.dumps(ex.to_dict() if hasattr(ex, "to_dict") else ex, ensure_ascii=False) + "\n")
 
         # 24. Style Retrieval Index (T028 & T029)
         if not index_path.exists() or self.config.force:
@@ -842,9 +842,9 @@ class PersonaPipeline:
                     matched_resp_vecs.append(v / np.linalg.norm(v))
 
             idx_engine = StyleEmbeddingIndex(
-                examples=examples,
                 context_vectors=np.array(matched_ctx_vecs, dtype=np.float32),
                 response_vectors=np.array(matched_resp_vecs, dtype=np.float32),
+                metadata=examples,
             )
             idx_engine.save(self.style_index_dir)
 
