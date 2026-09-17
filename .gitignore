@@ -46,6 +46,10 @@ htmlcov/
 # Logs & DBs
 *.log
 *.sqlite3
+*.db
+data/cache/
+data/*.json
+data/*.db
 
 # Large binary / data formats
 *.npz

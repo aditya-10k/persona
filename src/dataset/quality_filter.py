@@ -16,7 +16,10 @@ from collections import Counter
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
 
-import emoji
+try:
+    import emoji
+except ImportError:
+    emoji = None
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +77,10 @@ class QualityFilter:
             return False, "system_event_response"
 
         # 5. Punctuation pings (dots, dashes with zero words or emojis)
-        has_emoji = emoji.emoji_count(target_text) > 0
+        if emoji is not None:
+            has_emoji = emoji.emoji_count(target_text) > 0
+        else:
+            has_emoji = bool(re.search(r'[\U00010000-\U0010ffff]', target_text))
         if not has_emoji and self.PUNCT_PING_PATTERN.match(target_text):
             return False, "punctuation_ping"
 
